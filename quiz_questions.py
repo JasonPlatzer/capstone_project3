@@ -120,8 +120,9 @@ def display_questions(num_of_questions, category_name):
         correct_answer = False
         end_of_question = datetime.datetime.now()
        
+        # check the value of points_earned_total
         user_results = QuizAnswer(time_attempted=start_of_question,points_earned=points_earned_total,
-        time_of_finish=end_of_question, id=id_of_question,user_answer=user_guess,correct_or_not=correct_answer, question=question_ask)
+        time_of_finish=end_of_question, question_id=id_of_question,user_answer=user_guess,correct_or_not=correct_answer, question=question_ask)
         user_results.save()
     end_time = datetime.datetime.now()
     time_taken = end_time - start
