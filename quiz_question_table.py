@@ -5,7 +5,7 @@ db = SqliteDatabase('quiz.sqlite')
 
 
 class QuizQuestion(Model):
-    id = AutoField()
+    question_id = AutoField()
     question = CharField()
     correct_answer = CharField()
     wrong_answer1 = CharField()
@@ -20,4 +20,4 @@ class QuizQuestion(Model):
         database = db
 
     def __str__(self):
-        return f'{self.id,}, {self.question}, {self.correct_answer}, {self.wrong_answer1}, {self.wrong_answer2}, {self.wrong_answer3}, {self.catagory}'
+        return f'{self.question_id,}, {self.question}, {self.correct_answer}, {self.wrong_answer1}, {self.wrong_answer2}, {self.wrong_answer3}, {self.catagory}'

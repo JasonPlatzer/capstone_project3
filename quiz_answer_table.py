@@ -11,9 +11,9 @@ class QuizAnswer(Model):
     time_attempted = DateTimeField()
     points_earned = FloatField(constraints=[Check('points_earned > 0')])
     time_of_finish = DateTimeField()
-    id = ForeignKeyField(QuizQuestion, to_field='id')
+    question_id = ForeignKeyField(QuizQuestion, to_field='question_id')
     user_answer = CharField()
-    correct_or_not = BooleanField()
+    correct_or_not = CharField()
     question = CharField()
     
 

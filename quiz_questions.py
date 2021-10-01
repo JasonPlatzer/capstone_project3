@@ -9,7 +9,6 @@ import random
 
 db = SqliteDatabase('quiz.sqlite')
 # results_general_knowledge = requests.get('https://opentdb.com/api.php?amount=50&category=9&type=multiple').text
-# results_entertainment_film = requests.get('https://opentdb.com/api.php?amount=50&category=9&type=multiple').text
 # results_entertainment_television = requests.get('https://opentdb.com/api.php?amount=50&category=14&type=multiple').text
 # results_science_computers = requests.get('https://opentdb.com/api.php?amount=50&category=18&type=multiple').text
 
@@ -38,6 +37,7 @@ def main():
     
     print('Welcome to the quiz.\nSelect the topic by number\n1. Science:Computers\n2. Entertainment:Television\n3. General Knowledge')
     ask_user()
+    
     db.close()
     
     
@@ -45,7 +45,8 @@ def main():
 
 def ask_user():
     category_name = ''
-    num_of_questions = 0
+    return_category = ''
+    
     ask_again = True
     while ask_again:
         topic = input('Select number: ')
@@ -53,47 +54,50 @@ def ask_user():
             topic = int(topic)
             if 0 < topic  < 4:
                 ask_again = False
-
-                num_questions = True
-                while num_questions:
-                    num_of_questions = input('Select number of questions to answer up to 20: ')
-                    if num_of_questions.isnumeric():
-                        num_of_questions = int(num_of_questions)
-                        return_num = num_of_questions
-                        if 0 < num_of_questions < 21:
-                            num_questions = False
+            if topic == 1:
+                category_name = 'Science: Computers'
+                return_category = category_name
+            if topic == 2:
+                category_name = 'Entertainment: Television'
+                return_category = category_name
+            if topic == 3:
+                category_name = 'General Knowledge'
+                return_category = category_name
+    
+    get_num_of_questions(return_category)
         
-
-                if topic == 1:
-                    category_name = 'Science: Computers'
-                    return_category = category_name
-                if topic == 2:
-                    category_name = 'Entertainment: Television'
-                    return_category = category_name
-                if topic == 3:
-                    category_name = 'General Knowledge'
-                    return_category = category_name
-            
-
-    display_questions(num_of_questions, category_name)
+def get_num_of_questions(return_category):
+    print(return_category)
+    num_of_questions = 0
+    num_questions = True
+    while num_questions:
+        num_of_questions = input('Select number of questions to answer up to 20: ')
+        if num_of_questions.isnumeric():
+            num_of_questions = int(num_of_questions)
         
-def display_questions(num_of_questions, category_name):
+            if 0 < num_of_questions < 21:
+                num_questions = False
+    display_questions(num_of_questions,return_category)
+        
+def display_questions(num_of_questions, return_category):
+
+    
     correct_answer = False
     id_of_session = random.randint(1, 1000000)
-
     the_points_per_question = 100 / num_of_questions
     points_earned_total = 0 
-    x = 0
-    id_of_question = QuizQuestion.get(QuizQuestion.catagory == category_name)
-    id_of_question = id_of_question.id
+    num_of_correct = 0
+    
+    id_of_question = QuizQuestion.get(QuizQuestion.catagory == return_category)
+    id_of_question = id_of_question.question_id
     x = id_of_question 
     start = datetime.datetime.now()
     print(start)    
     for  question in range(num_of_questions):
         
         answers_from_database = []
-        quiz_questions = QuizQuestion.get(QuizQuestion.id == x)
-        id_of_question = quiz_questions.id
+        quiz_questions = QuizQuestion.get(QuizQuestion.question_id == x)
+        id_of_question = quiz_questions.question_id
         start_of_question = datetime.datetime.now()
         question_ask = quiz_questions.question
         print(question_ask)
@@ -115,21 +119,32 @@ def display_questions(num_of_questions, category_name):
         if user_guess == question_ask:
                 correct_answer = True
                 print('correct')
+                num_of_correct += 1
                 points_earned_total = points_earned_total + the_points_per_question
         print('incorrect')
         correct_answer = False
         end_of_question = datetime.datetime.now()
-       
-        user_results = QuizAnswer(time_attempted=start_of_question,points_earned=points_earned_total,
-        time_of_finish=end_of_question, id=id_of_question,user_answer=user_guess,correct_or_not=correct_answer, question=question_ask)
-        user_results.save()
-    end_time = datetime.datetime.now()
-    time_taken = end_time - start
-    # from https://stackoverflow.com/questions/32211596/subtract-two-datetime-objects-python
-    print(str(time_taken.total_seconds()) + ' seconds')
+        end_time = datetime.datetime.now()
+        time_taken = end_time - start
         
-   
-            
+    # from https://stackoverflow.com/questions/32211596/subtract-two-datetime-objects-python
+        #print(str(time_taken.total_seconds()) + ' seconds')
+        fill_answer_table(start_of_question, points_earned_total, end_of_question, id_of_question, user_guess, correct_answer, question_ask)
+        print(f'{time_taken} seconds to complete quiz, {num_of_questions} questions asked {num_of_correct} questions answered correct, 100 total points available, {points_earned_total} points earned, {points_earned_total} % on quiz')
+def fill_answer_table(start_of_question, points_earned_total, end_of_question, id_of_question, user_guess, correct_answer, question_ask):
+        user_results = QuizAnswer(time_attempted=start_of_question,points_earned=points_earned_total, 
+        time_of_finish=end_of_question, question_id=id_of_question,user_answer=user_guess,correct_or_not=correct_answer, question=question_ask)
+        user_results.save()
+
+
+    
+
+    
+# # from https://www.reddit.com/r/Python/comments/1a8ngm/howto_get_last_record_in_table_using_peewee_orm/       
+#     last_row = QuizAnswer.select().order_by(QuizAnswer.question_id).get
+#     last_question = last_row.question
+#     print(last_question)
+#     db.close()
         
                 
 if __name__ == '__main__':
