@@ -1,7 +1,8 @@
 
 from peewee import *
+import db_config
 
-db = SqliteDatabase('quiz.sqlite')
+db = SqliteDatabase(db_config.database_name)
 
 
 class QuizQuestion(Model):

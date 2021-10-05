@@ -1,7 +1,8 @@
 from peewee import *
 from quiz_question_table import QuizQuestion
+import db_config
 
-db = SqliteDatabase('quiz.sqlite')
+db = SqliteDatabase(db_config.database_name)
 
 
 class QuizAnswer(Model):
@@ -9,12 +10,13 @@ class QuizAnswer(Model):
     
     
     time_attempted = DateTimeField()
-    points_earned = FloatField(constraints=[Check('points_earned > 0')])
+    points_earned = FloatField() #constraints=[Check()]
     time_of_finish = DateTimeField()
     question_id = ForeignKeyField(QuizQuestion, to_field='question_id')
     user_answer = CharField()
     correct_or_not = CharField()
     question = CharField()
+    id_of_session = CharField()
     
 
     class Meta:
