@@ -61,52 +61,7 @@ class TestQuiz(TestCase):
         quiz_questions.add_answer_table_row('2021-09-30 13:21:47.723264',30.5,'2021-09-30 13:21:47.723264', 258, 'good guess', True, question_asked, '401')
         check_if_same = QuizAnswer.select(QuizAnswer.question == question_asked)
         self.assertEqual(question_asked, check_if_same)
-
     
-    def test_incorrect_time_fails(self):
-        time_of_attempt = '2021-09-30 13:20:47.723264'
-        quiz_questions.add_answer_table_row('2022-09-30 1:20:47.723264',30.5,'2021-09-30 13:21:47.723264', 258, 'good guess', 'True', 'nhhy', '401')
-        check_if_same = QuizAnswer.select(QuizAnswer.time_attempted == '2021-09-30 13:20:47.723264')
-        self.assertNotEqual(time_of_attempt, check_if_same)
-
-    def test_wrong_points_fails(self):
-        points = 30.5
-        quiz_questions.add_answer_table_row('2021-09-30 13:21:47.723264',40.5,'2021-09-30 13:21:47.723264', 258, 'good guess', 'True', 'nhhy', '401')
-        check_if_same = QuizAnswer.select(QuizAnswer.points_earned == points)
-        self.assertNotEqual(points, check_if_same)
-    
-    def test_wrong_id_fails(self):
-        id_of_question = 258
-        quiz_questions.add_answer_table_row('2021-09-30 13:21:47.723264',30.5,'2021-09-30 13:21:47.723264', 1000, 'good guess', 'True', 'nhhy', '401')
-        check_if_same = QuizAnswer.select(QuizAnswer.question_id == id_of_question)
-        self.assertNotEqual(id_of_question, check_if_same)
-
-    def test_wrong_end_time_fails(self):
-        time_ended = '2021-09-30 13:21:47.723264'
-        quiz_questions.add_answer_table_row('2021-09-30 13:21:47.723264',30.5,'2022-09-30 13:21:47.723264', 258, 'good guess', 'True', 'nhhy', '401')
-        check_if_same = QuizAnswer.select(QuizAnswer.time_of_finish == time_ended)
-        self.assertNotEqual(time_ended, check_if_same)
-   
-    def test_wrong_answer_fails(self):
-        answer = 'good guess'
-        quiz_questions.add_answer_table_row('2021-09-30 13:21:47.723264',30.5,'2021-09-30 13:21:47.723264', 258, 'wrong answer', 'True', 'nhhy', '401')
-        check_if_same = QuizAnswer.select(QuizAnswer.user_answer == answer)
-        self.assertNotEqual(answer, check_if_same)
-    
-    def test_wrong_correct_or_not_fails(self):
-        correct = True
-        quiz_questions.add_answer_table_row('2021-09-30 13:21:47.723264',30.5,'2021-09-30 13:21:47.723264', 258, 'good guess', False, 'nhhy', '401')
-        check_if_same = QuizAnswer.select(QuizAnswer.correct_or_not == correct)
-        self.assertNotEqual(correct, check_if_same)
-
-    def test_wrong_question_added_fails(self):
-        question_asked = 'is the sky blue'
-        quiz_questions.add_answer_table_row('2021-09-30 13:21:47.723264',30.5,'2021-09-30 13:21:47.723264', 258, 'good guess', True, 'wrong question', '401')
-        check_if_same = QuizAnswer.select(QuizAnswer.question == question_asked)
-        self.assertNotEqual(question_asked, check_if_same)
-
-
-
     
             
     
