@@ -38,6 +38,11 @@ def main():
     print('Welcome to the quiz.\nSelect the topic by number\n1. Science:Computers\n2. Entertainment:Television\n3. General Knowledge')
     ask_user_for_category()()  # better name? 
     
+    # call quiz functions in sequence 
+
+    score = get_quiz_score()
+    print(score)
+
     db.close()
     
     
@@ -47,6 +52,14 @@ def get_categories_from_database():
     # A GREAT candidate for a test - test database has example questions with categories,
     # make sure this returns the list of all those categories 
     return # the actual list from your DB
+
+
+def quiz_score(user_session_id):  # check variable name 
+    # called after quiz is done - read from the quiz result table - answer table 
+    # query database - use an aggregate function so the DB can do the math here
+    # return the score 
+    pass # replace with your code
+    # another good function to write a test for 
 
 
 def ask_user_for_category():
@@ -107,48 +120,16 @@ def display_questions(num_of_questions, return_category):
     points_earned_total = 0 
     num_of_correct = 0
     # gets all the questions in that catagory, they are stored in groups in the database
-    first_question = QuizQuestion.get(QuizQuestion.catagory == return_category)
+    # first_question = QuizQuestion.get(QuizQuestion.catagory == return_category)   # .get returns one thing from DB (or zero things if no match)
+    all_questions = QuizQuestion.select(QuizQuestion.catagory == return_category)   # .select returns one thing from DB (or zero things if no match)
     # gets the id of the first question
     id_of_question = first_question.question_id
     # I have to put this in another variable to work right
     # x = id_of_question 
     start = datetime.datetime.now()
     print(start)    
-    for  question in range(num_of_questions):
-        # makes a list of all the question answer options to display
-        answers_from_database = []
-        # gets the first question
-        quiz_questions = QuizQuestion.get(QuizQuestion.question_id == id_of_question)
-        # sets the id of the answer to the id of the question
-        id_of_question = quiz_questions.question_id
-        start_of_question = datetime.datetime.now()
-        # getting all the possible answers of the question and putting them in a list
-        question_ask = quiz_questions.question
-        print(question_ask)
-        correct = quiz_questions.correct_answer
-        answers_from_database.append(correct)
-        wrong1 = quiz_questions.wrong_answer1
-        answers_from_database.append(wrong1)
-        wrong2 = quiz_questions.wrong_answer2
-        answers_from_database.append(wrong2)
-        wrong3 = quiz_questions.wrong_answer3
-        answers_from_database.append(wrong3)
-    
-    
-        random.shuffle(answers_from_database)
-        # printing all the answer options
-        for answer in answers_from_database:
-            print(answer)
-        user_guess = input('What is your guess ')
-        # if user guesses correctly
-        if user_guess == question_ask:
-                correct_answer = True
-                print('correct')
-                num_of_correct += 1
-                points_earned_total = points_earned_total + the_points_per_question
-        print('incorrect')
-        correct_answer = False
-        end_of_question = datetime.datetime.now()
+    for question in all_questions:
+        ask_one_question(question)   # todo maybe better name? 
     # gets time of end of quiz    
     end_time = datetime.datetime.now()
     time_taken = end_time - start
@@ -159,9 +140,47 @@ def display_questions(num_of_questions, return_category):
     
     add_answer_table_row(start_of_question, points_earned_total, end_of_question, id_of_question, user_guess, correct_answer, question_ask, id_of_quiz_session)
 
-        
+    # separate into other functions and write tests 
     print(f'{time_taken} seconds to complete quiz, {num_of_questions} questions asked {num_of_correct} questions answered correct, 100 total points available, {points_earned_total} points earned, {points_earned_total} % on quiz')
     
+
+def ask_one_question(question):
+    # makes a list of all the question answer options to display
+    answers_from_database = []
+    # gets the first question
+    # quiz_questions = QuizQuestion.get(QuizQuestion.question_id == id_of_question)
+    # sets the id of the answer to the id of the question
+    id_of_question = question.question_id
+    start_of_question = datetime.datetime.now()
+    # getting all the possible answers of the question and putting them in a list
+    question_ask = question.question
+    print(question_ask)
+    correct = quiz_questions.correct_answer  # fix these names too
+    answers_from_database.append(correct)
+    wrong1 = quiz_questions.wrong_answer1
+    answers_from_database.append(wrong1)
+    wrong2 = quiz_questions.wrong_answer2
+    answers_from_database.append(wrong2)
+    wrong3 = quiz_questions.wrong_answer3
+    answers_from_database.append(wrong3)
+
+
+    random.shuffle(answers_from_database)
+    # printing all the answer options
+    for answer in answers_from_database:
+        print(answer)
+    user_guess = input('What is your guess ')
+    # if user guesses correctly
+    if user_guess == question_ask:
+            correct_answer = True
+            print('correct')
+            num_of_correct += 1
+            points_earned_total = points_earned_total + the_points_per_question
+    print('incorrect')
+    correct_answer = False
+    end_of_question = datetime.datetime.now()
+
+
 def add_answer_table_row(start_of_question, points_earned_total, end_of_question, id_of_question, user_guess, correct_answer, question_ask, id_of_quiz_session):
     
         user_results = QuizAnswer(time_attempted=start_of_question,points_earned=points_earned_total, 

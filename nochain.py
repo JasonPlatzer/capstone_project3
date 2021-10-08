@@ -1,17 +1,26 @@
 
+
 def main():
-    a()
+    # an overview of what the program does 
+    topics = get_topics()
+    number_questions = get_number_of_questions(topics)
+    start_quiz(topic, number_questions)
+
+# these functions can be tested 
+
 
 def a():
-    # does stuff 
-    b() 
+    # does stuff and generates data
+    return "data"
 
-def b():
-    # does more stuff
-    c()
+def b(data):
+    # does more stuff and generates a number
+    return 1234
 
-def c():
+def c(number):
     # do more stuff 
-    pass 
+    print(number)
+
+
 
 main()
