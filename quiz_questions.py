@@ -36,17 +36,26 @@ def main():
 
     
     print('Welcome to the quiz.\nSelect the topic by number\n1. Science:Computers\n2. Entertainment:Television\n3. General Knowledge')
-    ask_user()
+    ask_user_for_category()()  # better name? 
     
     db.close()
     
     
     
+def get_categories_from_database():
+    # todo get categories from DB - SQL query (via peewee)
+    # A GREAT candidate for a test - test database has example questions with categories,
+    # make sure this returns the list of all those categories 
+    return # the actual list from your DB
 
-def ask_user():
+
+def ask_user_for_category():
     category_name = ''
     return_category = ''
     
+    categories = get_categories_from_database()
+    # query database, get a list of unique categories 
+    # display list and ask user to pick one 
     ask_again = True
     while ask_again:
         topic = input('Select number: ')
@@ -54,23 +63,27 @@ def ask_user():
             topic = int(topic)
             if 0 < topic  < 4:
                 ask_again = False
-            if topic == 1:
-                category_name = 'Science: Computers'
-                return_category = category_name
-            if topic == 2:
-                category_name = 'Entertainment: Television'
-                return_category = category_name
-            if topic == 3:
-                category_name = 'General Knowledge'
-                return_category = category_name
+            # if topic == 1:
+            #     category_name = 'Science: Computers'
+            #     return_category = category_name
+            # if topic == 2:
+            #     category_name = 'Entertainment: Television'
+            #     return_category = category_name
+            # if topic == 3:
+            #     category_name = 'General Knowledge'
+            #     return_category = category_name
+
+    return return_category
     
-    get_num_of_questions(return_category)
+    # number_of_quesions = get_num_of_questions(return_category)
+    # display_questions(number_of_questions, return_category)
         
-def get_num_of_questions(return_category):
-    print(return_category)
+
+def get_num_of_questions():
+    """ Ask the user for the number of questions, ensure data is an integer between 1 and 20 """
     num_of_questions = 0
-    num_questions = True
-    while num_questions:
+    num_questions_not_valid = True  # more specific variable name 
+    while num_questions_not_valid:
         # checking to see if input is an number
         num_of_questions = input('Select number of questions to answer up to 20: ')
         if num_of_questions.isnumeric():
@@ -78,34 +91,34 @@ def get_num_of_questions(return_category):
             num_of_questions = int(num_of_questions)
         
             if 0 < num_of_questions < 21:
-                num_questions = False
-    display_questions(num_of_questions,return_category)
-        
-def display_questions(num_of_questions, return_category):
+                num_questions_not_valid = False
+
+    return num_of_questions
 
     
+def display_questions(num_of_questions, return_category):
+
     correct_answer = False
     # from https://www.geeksforgeeks.org/generating-random-ids-using-uuid-python/
     id_of_quiz_session = uuid.uuid4().hex
-    
     
     # setting the points to 100 and giving all users the chance to get 100 points
     the_points_per_question = 100 / num_of_questions
     points_earned_total = 0 
     num_of_correct = 0
     # gets all the questions in that catagory, they are stored in groups in the database
-    id_of_question = QuizQuestion.get(QuizQuestion.catagory == return_category)
+    first_question = QuizQuestion.get(QuizQuestion.catagory == return_category)
     # gets the id of the first question
-    id_of_question = id_of_question.question_id
+    id_of_question = first_question.question_id
     # I have to put this in another variable to work right
-    x = id_of_question 
+    # x = id_of_question 
     start = datetime.datetime.now()
     print(start)    
     for  question in range(num_of_questions):
         # makes a list of all the question answer options to display
         answers_from_database = []
         # gets the first question
-        quiz_questions = QuizQuestion.get(QuizQuestion.question_id == x)
+        quiz_questions = QuizQuestion.get(QuizQuestion.question_id == id_of_question)
         # sets the id of the answer to the id of the question
         id_of_question = quiz_questions.question_id
         start_of_question = datetime.datetime.now()
