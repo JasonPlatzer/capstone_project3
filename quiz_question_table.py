@@ -6,13 +6,13 @@ db = SqliteDatabase(db_config.database_name)
 
 
 class QuizQuestion(Model):
-    question_id = AutoField()
+    question_id = AutoField()  
     question = CharField()
     correct_answer = CharField()
     wrong_answer1 = CharField()
     wrong_answer2 = CharField()
     wrong_answer3 = CharField()
-    catagory = CharField()
+    catagory = CharField()  # be careful with spelling - "category"
     #points_per_question = FloatField(constraints=[Check('points_per_question > 0')])
     # from https://stackoverflow.com/questions/25105188/python-peewee-how-to-create-a-foreign-key
 

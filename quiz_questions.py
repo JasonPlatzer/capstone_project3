@@ -9,7 +9,7 @@ import random
 import db_config
 import uuid
 
-db = SqliteDatabase(db_config.database_name)
+db = SqliteDatabase(db_config.database_name)  # see note in test 
 
 # where I got the questions from, I put them in text so there are display issues-showing characters where letters should be
 
@@ -43,31 +43,41 @@ def main():
     
     
 
-def ask_user():
+def ask_user():  # ask user what? Be specific with function names 
+
+    # query the database - write a function that queries the dataabase - and get 
+    # the actual topics that are present. So your program should still work if more topics 
+    # are added, or topics are removed 
+
     category_name = ''
-    return_category = ''
+    return_category = ''  # one of these variables is redundant
     
     ask_again = True
     while ask_again:
         topic = input('Select number: ')
         if topic.isnumeric(): 
             topic = int(topic)
-            if 0 < topic  < 4:
+            if 1 <= topic  <= 3:   # if the range is 1 to 3, this is clearer, otherwise you could assume 0.4 or 3.4 are ok 
                 ask_again = False
             if topic == 1:
                 category_name = 'Science: Computers'
-                return_category = category_name
+
             if topic == 2:
                 category_name = 'Entertainment: Television'
-                return_category = category_name
+
             if topic == 3:
                 category_name = 'General Knowledge'
-                return_category = category_name
-    
-    get_num_of_questions(return_category)
+
+    get_num_of_questions(category_name)
         
-def get_num_of_questions(return_category):
-    print(return_category)
+
+def get_num_of_questions(category):  # rename the parameter category, it's not being returned here
+
+    # query the database - write a function that queries the dataabase - and get 
+    # the number of questions in the DB for the category.  that are present. So your program should still work if more topics 
+    # are added, or topics are removed 
+
+    print(category)
     num_of_questions = 0
     num_questions = True
     while num_questions:
@@ -77,10 +87,14 @@ def get_num_of_questions(return_category):
             # changing input to an ingteger
             num_of_questions = int(num_of_questions)
         
-            if 0 < num_of_questions < 21:
+            # if the range is 1 to 20, this is clearer, using the numbers that make up the range in the condtion. otherwise you could assume 0.4 or 20.2 are ok 
+            if 1 <= num_of_questions <= 20:  
                 num_questions = False
-    display_questions(num_of_questions,return_category)
+    display_questions(num_of_questions,category)
         
+
+# function names - this does a lot more than display questions   
+# this function should be broken into a number of smaller, simpler functions    
 def display_questions(num_of_questions, return_category):
 
     
@@ -102,8 +116,6 @@ def display_questions(num_of_questions, return_category):
     start = datetime.datetime.now()
     print(start)    
     for  question in range(num_of_questions):
-        # makes a list of all the question answer options to display
-        answers_from_database = []
         # gets the first question
         quiz_questions = QuizQuestion.get(QuizQuestion.question_id == x)
         # sets the id of the answer to the id of the question
@@ -113,13 +125,22 @@ def display_questions(num_of_questions, return_category):
         question_ask = quiz_questions.question
         print(question_ask)
         correct = quiz_questions.correct_answer
-        answers_from_database.append(correct)
-        wrong1 = quiz_questions.wrong_answer1
-        answers_from_database.append(wrong1)
-        wrong2 = quiz_questions.wrong_answer2
-        answers_from_database.append(wrong2)
-        wrong3 = quiz_questions.wrong_answer3
-        answers_from_database.append(wrong3)
+
+        # makes a list of all the question answer options to display
+        answers_from_database = [
+            correct,
+            quiz_questions.wrong_answer1,
+            quiz_questions.wrong_answer2,
+            quiz_questions.wrong_answer3
+        ]
+        
+        # answers_from_database.append(correct)
+        # wrong1 = quiz_questions.wrong_answer1
+        # answers_from_database.append(wrong1)
+        # wrong2 = quiz_questions.wrong_answer2
+        # answers_from_database.append(wrong2)
+        # wrong3 = quiz_questions.wrong_answer3
+        # answers_from_database.append(wrong3)
     
     
         random.shuffle(answers_from_database)
@@ -133,7 +154,8 @@ def display_questions(num_of_questions, return_category):
                 print('correct')
                 num_of_correct += 1
                 points_earned_total = points_earned_total + the_points_per_question
-        print('incorrect')
+        print('incorrect')   # this always prints, should this be in an else block? 
+        # if the user is incorrect, display the correct answer 
         correct_answer = False
         end_of_question = datetime.datetime.now()
     # gets time of end of quiz    

@@ -1,8 +1,10 @@
 from peewee import *
+from datetime import datetime
 import unittest
 from unittest import TestCase
 from unittest.mock import patch
 import db_config
+
 
 
 db_config.database_name = 'test_quiz.sqlite'
@@ -20,11 +22,41 @@ class TestQuiz(TestCase):
         self.db.drop_tables([QuizAnswer, QuizQuestion])
         self.db.create_tables([QuizAnswer, QuizQuestion])
         
+
     def test_time_started_added_correctly(self):
         time_of_attempt = '2021-09-30 13:20:47.723264'
         quiz_questions.add_answer_table_row(time_of_attempt,30.5,'2021-09-30 13:21:47.723264', 258, 'good guess', 'True', 'nhhy', '401')
+        # This test isn't checking what you think it is 
+        # the check_is_same variable is a peewee ModelSelect object - it's not data from the database (yet)
         check_if_same = QuizAnswer.select(QuizAnswer.time_attempted == '2021-09-30 13:20:47.723264')
-        self.assertEqual(time_of_attempt, check_if_same)
+
+        # here's a funny thing though, these statements are the opposite of each other, and they both pass
+        self.assertEqual(time_of_attempt, check_if_same)  # check same - passes
+        self.assertNotEqual(time_of_attempt, check_if_same)  # check different - also passes! 
+
+        # what's going on, and I had to read peewee source code to figure this out, is that 
+        # peweee ModelSelect objects override the defaul comparing equals and comparing not equals 
+        # python methods, with their own custom behavior which makes sense in peewee world but makes your tests 
+        # behave weirldy when comparing a ModelSelect to a String. The ModelSelect is equal and not equal to unexpected things.
+
+        # The important things here is that the assert statment is checking if two very different things 
+        # are equal, so even though the test is passing, it's not checking what you want to check.
+        # a test that does check your code, 
+
+        # you need to get() or execute() to get the data, assuming you expect one result, .get is good 
+
+        # the structure is Model.select().where(  ... your query here ... ).get() 
+
+        # use a descriptive variable name - what data does this variable store? 
+        answer_from_database = QuizAnswer.select().where(QuizAnswer.time_attempted == '2021-09-30 13:20:47.723264').get()
+        
+        datetime_of_attempt = datetime.fromisoformat(time_of_attempt)  # make a datetime from the string 
+        self.assertEqual(datetime_of_attempt, answer_from_database.time_attempted)  # passes - compare the expected datatime to the one in the DB
+
+        self.assertEqual(time_of_attempt, answer_from_database.time_attempted) # but this test fails - Peewee is storing time_attempted 
+        # as a datetime object, which is not the same as a string
+
+
 
     def test_points_earned_added_correctly(self):
         points = 30.5
